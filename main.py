@@ -3,6 +3,11 @@ import cv2
 from gaze_tracking import GazeTracking
 import serial
 import time
+from cvzone.SerialModule import SerialObject
+from time import sleep
+
+esp = SerialObject('/dev/cu.usbserial-56CA0018311',115200)
+
 
 # Blink threshold for avoiding the unnecessary forward motion.
 # Count will count the blinking and more than 15 count will drive the Wheelchair.
@@ -32,12 +37,16 @@ while True:
         count += 1
         if blink_thresh < count:
             text = "Half Closed"
+            esp.sendData([1])
     elif gaze.is_right():
         text = "Looking right"
+        esp.sendData([0])
     elif gaze.is_left():
         text = "Looking left"
+        esp.sendData([0])
     elif gaze.is_center():
         text = "Looking center"
+        esp.sendData([0])
         count = 0
     else:
         count = 0
