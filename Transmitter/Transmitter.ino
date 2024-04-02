@@ -1,7 +1,9 @@
 
 #include<esp_now.h>
 #include<WiFi.h>
+#include<cvzone.h>
 
+SerialData serialdata('COM6',115200)
 
 
 //Varibles for send data
@@ -16,7 +18,7 @@ uint8_t receiver[] = {}
 
 //define the data structure
 typedef struct struct_message{
-  int a;
+  int a[1];
 } struct_message;
 
 struct_message myData;
@@ -45,9 +47,28 @@ void setup() {
   //Register the send callbakc
   esp_now_register_send_cb(OnDataSent);
 
+  //register peer
+  memcpy(peerInfo.peer_addr, receiver,6);
+  peerInfo.channel = 0;
+  peerInfo.encrypt = false;
+
+  //add peer
+  if (esp_now_add_peer(&peerInfo) != ESP_OK){
+  Serial.println("Failed to add peer")}
+  return;
+
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
+
+  serialData.get(valRec);
+  myData.a = valRec[0];
+
+  //send data
+  esp_err_t result = esp_now_send(receiver, (uint8_t *) &myData, sizeof (myData));
+  delay(10)
+
+
 
 }
